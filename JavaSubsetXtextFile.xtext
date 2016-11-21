@@ -1,0 +1,64 @@
+grammar org.xtext.JavaSubset with org.eclipse.xtext.common.Terminals
+
+generate javaSubset "http://www.xtext.org/JavaSubset"
+
+Model:
+	classes+=Class*;
+	
+Class:
+	(modifiers+=ClassModifier)* 'class' name=ID ('extends' superType=[Class])? '{'
+		(features+=Feature)*
+	'}'
+;
+
+//could find a way to place Field/Method name and modifiers in root object (feature)
+Feature:
+		Method | Field | Class
+;
+
+Field:
+	  (modifiers+=FeatureModifier)* type=[Type] name=ID owner=[Class] ('=' value=ID)? ';'
+;
+
+Method:
+	(modifiers+=FeatureModifier)* type=[Type] name=ID owner=[Class] '(' (params+=Parameter (',' params+=Parameter)*)? ')' block=Block
+;
+
+Parameter:
+	(isFinal?='final') type=[Type] name=ID
+;
+
+Block:
+	{Block} '{'
+		(statements+=Assignment)*
+	'}'
+;
+
+//may add more later on (for loops, while, try etc...)
+//right now you can reference a moethfd (getX() = 3) -> change this!
+Assignment:
+	 variable=[Field] '=' newValue=ID
+;
+
+	
+/*Type rules*/
+Type:
+	Class | PrimitiveType | ArrayType
+;
+PrimitiveType:
+	kind=PrimitiveTag;
+ArrayType:
+	elementType=[Type] '[]'
+;
+		
+/* Predefined primitive types in Java */
+PrimitiveTag:
+	'boolean' | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' | 'char' | 'void'; //should remove void....
+
+/* Class modifiers */
+ClassModifier:
+	'public' | 'protected' | 'private' | 'abstract' | 'static' | 'final' |'strictfp';
+
+/* Feature Modifiers */
+FeatureModifier:
+	 ClassModifier | 'native' | 'synchronized' | 'transient' | 'volatile';
