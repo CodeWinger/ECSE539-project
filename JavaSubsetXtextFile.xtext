@@ -13,7 +13,7 @@ Class:
 
 //could find a way to place Field/Method name and modifiers in root object (feature)
 Feature:
-		Method | Field | Class
+		Method | Field | Class //enumeration?
 ;
 
 Field:
@@ -43,7 +43,7 @@ Assignment:
 	
 /*Type rules*/
 Type:
-	Class | PrimitiveType | ArrayType
+	Class | /*PrimitiveType |*/ ArrayType | {Type} PrimitiveTag
 ;
 PrimitiveType:
 	kind=PrimitiveTag;
