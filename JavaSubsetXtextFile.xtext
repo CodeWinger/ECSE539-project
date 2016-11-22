@@ -17,11 +17,11 @@ Feature:
 ;
 
 Field:
-	  (modifiers+=FeatureModifier)* type=[Type] name=ID owner=[Class] ('=' value=ID)? ';'
+	  (modifiers+=FeatureModifier)* type=[Type | PrimitiveTag] name=ID owner=[Class] ('=' value=ID)? ';'
 ;
 
 Method:
-	(modifiers+=FeatureModifier)* type=[Type] name=ID owner=[Class] '(' (params+=Parameter (',' params+=Parameter)*)? ')' block=Block
+	(modifiers+=FeatureModifier)* type=[Type | PrimitiveTag] name=ID owner=[Class] '(' (params+=Parameter (',' params+=Parameter)*)? ')' block=Block
 ;
 
 Parameter:
@@ -43,12 +43,13 @@ Assignment:
 	
 /*Type rules*/
 Type:
-	Class | /*PrimitiveType |*/ ArrayType | {Type} PrimitiveTag
+	Class | ArrayType
 ;
-PrimitiveType:
-	kind=PrimitiveTag;
+//PrimitiveType:
+	//kind=PrimitiveTag;
+
 ArrayType:
-	elementType=[Type] '[]'
+	elementType=[Type | PrimitiveTag] '[]'
 ;
 		
 /* Predefined primitive types in Java */
