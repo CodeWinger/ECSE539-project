@@ -17,7 +17,7 @@ Feature:
 ;
 
 Field:
-	  (modifiers+=FeatureModifier)* type=[Type] name=ID owner=[Class] ('=' value=ID)? ';'
+	  (modifiers+=FeatureModifier)* type=[Type | 'boolean'] name=ID {Field.owner=current} ('=' value=ID)? ';'
 ;
 
 //Method:
@@ -43,7 +43,7 @@ Field:
 	
 /*Type rules*/
 Type:
-	Class | Primitive //| ArrayType
+	Class //| Primitive //| ArrayType
 ;
 //PrimitiveType:
 	//kind=PrimitiveTag;
@@ -54,7 +54,7 @@ Type:
 		
 /* Predefined primitive types in Java */
 Primitive:
-	{PrimitiveTag} name='boolean' // | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' | 'char' | 'void'; //should remove void....
+	{Primitive} name='boolean' // | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' | 'char' | 'void'; //should remove void....
 ;
 /* Class modifiers */
 ClassModifier:
