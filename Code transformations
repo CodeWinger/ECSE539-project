@@ -1,0 +1,93 @@
+/* ======================================== Types ========================================*/ 
+(* === Example code === *)
+type typExp =
+  | TypInt
+  | TypVar of char
+  | Arrow of typExp * typExp
+  | Lst of typExp
+
+type substitution = (char * typExp) list
+(* ======= Java ======= *)
+public class TypExp {
+	...
+	public final static class TypInt extends TypExp{
+		private final value;
+		public TypInt(int aValue){
+			value = aValue;
+		}
+	}
+	public final static class TypVar extends TypExp {
+		private final char value;
+		public TypVar(char aValue){
+			value = aValue;
+		}
+	}
+	public final static class Arrow extends TypExp{
+		private final typExp1;
+		private final typExp2;
+		public Arrow(typeExp aValue1, typeExp aValue2){
+			typeExp1 = aValue1;
+			typeExp2 = aValue2;
+		}
+	}
+	public final static class Lst extends TypExp{...}
+}
+public class Substiution  {...}
+/* ======================================== Function ========================================*/ 
+(* === Example code === *)
+let rec occurCheck (v: char) (tau: typExp) : bool = 
+    match tau with
+    | TypInt -> false
+    | TypVar a -> if (v = a) then true else false
+    | Arrow (a,b) -> (occurCheck v a) || (occurCheck v b)
+    | Lst a -> occurCheck v a
+    | _ -> 
+(* ======= Java ======= *)
+public class Program{ //static class used for the program to execute in
+	public static void main(){...}
+
+	private static boolean occurCheck(char v, tau TypExp) {
+		if (tau instanceof TypeInt){
+		 ...
+		} else if(tau instanceof )
+
+		else { //empty (_) specified
+			do something
+		}
+
+		else { //empty (_) not specified
+			throw new Exception("Could not pattern match")''
+		}
+	}
+}
+
+
+Modules 
+
+
+pattern-matching
+
+
+let bindings
+	immutability
+
+streams
+continuations
+higher-order functions
+	partial application
+	currying
+	compostion
+
+
+
+
+lazy vs eager computations
+
+
+
+typing hard 
+dynamic
+
+
+recursion
+tuples
