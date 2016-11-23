@@ -13,52 +13,54 @@ Class:
 
 //could find a way to place Field/Method name and modifiers in root object (feature)
 Feature:
-		Field //| Class | Method //enumeration?
+		Field {Field.owner = current} 
+	  | Class {Class.owner = current} 
+	  | Method  {Method.owner= current} //enumeration?
 ;
 
 Field:
-	  (modifiers+=FeatureModifier)* type=[Type | 'boolean'] name=ID {Field.owner=current} ('=' value=ID)? ';'
+	  (modifiers+=FeatureModifier)* (type=[Type] | simpleType=(Primitive)) name=ID ('=' value=ID)? ';'
 ;
 
-//Method:
-//	(modifiers+=FeatureModifier)* type=[Type] name=ID owner=[Class] '(' (params+=Parameter (',' params+=Parameter)*)? ')' block=Block
-//;
+Method:
+	(modifiers+=FeatureModifier)* (type=[Type] | simpleType=(Primitive)) '(' (params+=Parameter (',' params+=Parameter)*)? ')' block=Block {Block.owner = current}
+;
 
-//Parameter:
-//	(isFinal?='final') type=[Type] name=ID
-//;
+Parameter:
+	(isFinal?='final') (type=[Type] | simpleType=(Primitive)) name=ID
+;
 
-//Block:
-//	{Block} '{'
-//		//(statements+=Assignment)*
-//	'}'
-//;
+Block:
+	{Block} '{'
+		(statements+=Assignment {Assignment.owner = current})*
+	'}'
+;
 
 //may add more later on (for loops, while, try etc...)
 //right now you can reference a moethfd (getX() = 3) -> change this!
-//Assignment:
-//	 variable=[Field] '=' newValue=ID
-//;
+Assignment:
+	   variable=[Field] '=' newValue=ID
+	 | varible=[Parameter] '=' newValue=ID
+;
 
 	
 /*Type rules*/
 Type:
-	Class //| Primitive //| ArrayType
-;
-//PrimitiveType:
-	//kind=PrimitiveTag;
+	Class | ArrayType
+	;
 
-//ArrayType:
-//	elementType=[Type] '[]'
-//;
+ArrayType:
+	(type=[Type] | simpleType=(Primitive)) '[]'
+;
 		
 /* Predefined primitive types in Java */
 Primitive:
-	{Primitive} name='boolean' // | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' | 'char' | 'void'; //should remove void....
-;
+	'boolean' | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' | 'char' | 'void'; //should remove void....
+
 /* Class modifiers */
 ClassModifier:
-	'public' | 'protected' | 'private' | 'abstract' | 'static' | 'final' |'strictfp';
+	'public' | 'protected' | 'private' | 'abstract' | 'static' | 'final' |'strictfp'
+;
 
 /* Feature Modifiers */
 FeatureModifier:
