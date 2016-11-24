@@ -1,0 +1,47 @@
+-- paths to metamodels for content assist
+--@path JavaSubset=/org.xtext.example.mydsl/model/generated/MyDsl.ecore
+--@path Fminor=/org.xtext.example.fminor/model/generated/Fminor.ecore
+
+module Fminor2JavaSubset;
+create OUT : JavaSubset from IN : Fminor;
+
+rule Model2Model {
+	from
+		f: Fminor!Model
+	to 
+		j: JavaSubset!Model (
+			features <- f.expressions 
+		)
+}
+
+rule UserType2SuperClass {
+	from
+		t: Fminor!UserType
+	to
+		c: JavaSubset!Class (
+			name <- t.name
+		)
+}
+
+rule SubType2SubClass {
+	from
+		s: Fminor!UserType
+	to
+		c: JavaSubset!Class (
+		)
+		do {
+			for (sub in Fminor!UserType.subtypes) {
+				c <- thisModule.NewSubType(sub);
+				c.owner <- thisModule.NewSubType(s);
+			}
+		}
+}
+
+lazy rule NewSubType {
+	from 
+		t: Fminor!SubType
+	to
+		c: JavaSubset!Class (
+			name <- t.name
+		)
+}
