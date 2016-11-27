@@ -1,0 +1,78 @@
+grammar org.xtext.example.mydsl.MyDsl with org.eclipse.xtext.common.Terminals
+
+generate myDsl "http://www.xtext.org/example/mydsl/MyDsl"
+
+Model:
+	classes+=Class*;
+	
+Class:
+	(modifiers+=ClassModifier)* 'class' name=ID ('extends' superType=[Class])? '{'
+		(features+=Feature)*
+	'}'
+;
+
+//could find a way to place Field/Method name and modifiers in root object (feature)
+Feature:
+		Variable {Variable.owner = current} 
+	  | Class {Class.owner = current} 
+	  | Method  {Method.owner= current} //enumeration?
+;
+
+Variable:
+	Field //| Parameter 
+;
+
+Field:
+	  (modifiers+=FeatureModifier)* (type=[Type] | simpleType=(Primitive)) name=ID ('=' value=ID)? ';'
+;
+
+Method:
+	Function
+  | Constructor
+;
+
+Function:
+	(modifiers+=FeatureModifier)* (returnType=[Type] | simpleType=(Primitive)) name=ID '(' (params+=Parameter (',' params+=Parameter)*)? ')' block=Block {Block.owner = current}
+;
+
+Constructor:
+	(modifiers+=FeatureModifier)* (classConstructor=[Class]) '(' (params+=Parameter (',' params+=Parameter)*)? ')' block=Block {Block.owner = current}
+;
+
+Parameter:
+	(isFinal?='final')? (type=[Type] | simpleType=(Primitive)) name=ID
+;
+
+Block:
+	{Block} '{'
+		(statements+=Assignment {Assignment.owner = current})*
+	'}'
+;
+
+//may add more later on (for loops, while, try etc...)
+//right now you can reference a moethfd (getX() = 3) -> change this!
+Assignment:
+	variable=[Variable] '=' value=ID ';'
+;
+
+/*Type rules*/
+Type:
+	Class | ArrayType
+	;
+
+ArrayType:
+	(type=[Type] | simpleType=(Primitive)) '[]'
+;
+		
+/* Predefined primitive types in Java */
+Primitive:
+	'boolean' | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' | 'char' | 'void'; //should remove void....
+
+/* Class modifiers */
+ClassModifier:
+	'public' | 'protected' | 'private' | 'abstract' | 'static' | 'final' |'strictfp'
+;
+
+/* Feature Modifiers */
+FeatureModifier:
+ClassModifier | 'native' | 'synchronized' | 'transient' | 'volatile';
