@@ -1,0 +1,218 @@
+-- paths to metamodels for content assist
+--@path MyDsl=/org.xtext.example.mydsl/model/generated/MyDsl.ecore
+--@path Fminor=/org.xtext.example.fminor/model/generated/Fminor.ecore
+
+
+-- Method -> BehavioralFeature
+-- Function -> Method
+module Fminor2MyDsl;
+create OUT : MyDsl from IN : Fminor;
+
+helper def : id : Integer = 0;
+
+rule Model2Model {
+	from
+		f: Fminor!Model
+	to 
+		j: MyDsl!Model (
+			features <- f.expressions 
+		)
+}
+
+rule UserType2SuperClass {
+	from
+		t: Fminor!UserType
+	to
+		c: MyDsl!Class (
+			name <- t.name,
+			modifiers <- 'public'
+		)
+}
+
+rule SubType2SubClass {
+	from
+		s: Fminor!UserType
+	to
+		c: MyDsl!Class (
+		)
+		do {
+			for (sub in Fminor!UserType.subtypes) {
+				c <- thisModule.NewSubType(sub);
+				c.owner <- s;
+				c.superType <- s;
+			}
+		}
+}
+
+rule SubType2VarClass {
+	from
+		s: Fminor!UserType (s-> isPrim())
+	to
+		c: MyDsl!Class (
+		)
+		do {
+			for (sub in s.subtypes) {
+				c <- thisModule.NewVarType(sub);
+				c.owner <- s;
+				c.superType <- s;
+			}
+		}
+}
+
+rule SubType2TupClass {
+	from
+		s: Fminor!UserType (s-> isTup())
+	to
+		c: MyDsl!Class (
+		)
+		do {
+			for (sub in s.subtypes) {
+				c <- thisModule.NewTupType(sub);
+				c.owner <- s;
+				c.superType <- s;
+			}
+		}
+}
+
+rule SubType2LstClass {
+	from
+		s: Fminor!UserType (s-> isLst())
+	to
+		c: MyDsl!Class (
+		)
+		do {
+			for (sub in s.subtypes) {
+				c <- thisModule.NewLstType(sub);
+				c.owner <- s;
+				c.superType <- s;
+			}
+		}
+}
+
+lazy rule NewSubType {
+	from 
+		t: Fminor!SubType
+	to
+		c: MyDsl!Class (
+			name <- t.name,
+			modifiers <- 'public final static',
+			features <- thisModule.NewConstructor()
+		)
+	
+}
+
+lazy rule NewConstructor {
+	from 
+		t: Fminor!SubType
+	to
+		m: MyDsl!Constructor (
+			modifiers <- 'public'
+		)
+}
+
+lazy rule NewVarType {
+	from 
+		t: Fminor!SubType
+	to
+		c: MyDsl!Class (
+			name <- t.name,
+			modifiers <- 'public final static',
+			features <- thisModule.NewVarConstructor() + thisModule.NewVarField() -> collect()
+		)
+}
+
+lazy rule NewVarField {
+	from 
+		t: Fminor!SubType
+	to
+		c: MyDsl!Field (
+			name <- 'value',
+			modifiers <- 'private final ' + t.simpleType
+		) 
+}
+
+lazy rule NewVarConstructor {
+	from 
+		t: Fminor!SubType
+	to
+		m: MyDsl!Constructor (
+			modifiers <- 'public',
+			params <- 'final ' + t.simpleType + ' aValue',
+			assignments <- 'value = aValue'
+		)
+}
+
+lazy rule NewTupType {
+	from 
+		t: Fminor!SubType 
+	to
+		c: MyDsl!Class (
+			name <- t.name,
+			modifiers <- 'public final static',
+			features <- thisModule.NewTupConstructor() + thisModule.NewTupField() + thisModule.NewTupField()-> collect()
+		)
+	
+}
+
+lazy rule NewTupConstructor {
+	from 
+		t: Fminor!SubType (t -> isTup())
+	to
+		m: MyDsl!Constructor (
+			modifiers <- 'public',
+			params <- thisModule.NewParm(t) + thisModule.NewParm(t) -> collect(),
+			assignments <- 'typExp1 = aValue1' + 'typExp2 = aValue2' -> collect()
+		)
+}
+
+lazy rule NewTupField {
+	from 
+		t: Fminor!SubType
+	to
+		c: MyDsl!Field (
+			name <- 'typExp1',
+			modifiers <- 'private final ' + t.types
+		) 
+}
+
+lazy rule NewTypeConstructor {
+	from 
+		t: Fminor!SubType
+	to
+		m: MyDsl!Constructor (
+			modifiers <- 'public',
+			params <- thisModule.NewParm(t),
+			assignments <- 'value = aValue'
+		)
+}
+
+lazy rule NewParm {
+	from 
+		t: Fminor!SubType
+	to
+		p: MyDsl!Parameter (
+			name <- 'aValue',
+			type <- t.super()
+		)
+}
+
+helper context Fminor!SubType def: isPrim(): Boolean = 
+	if not self.simpleType.oclIsUndefined() then 
+		true
+	else
+		false
+	endif;
+
+helper context Fminor!SubType def: isTup(): Boolean = 
+	if not self.parameter2.oclIsUndefined() then 
+		true
+	else
+		false
+	endif;
+
+helper context Fminor!SubType def: isLst(): Boolean = 
+	if not self.parameter.oclIsUndefined() then 
+		true
+	else
+		false
+	endif;
