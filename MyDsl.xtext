@@ -15,7 +15,7 @@ Class:
 Feature:
 		Variable {Variable.owner = current} 
 	  | Class {Class.owner = current} 
-	  | Method  {Method.owner= current} //enumeration?
+	  | BehavioralFeature  {BehavioralFeature.owner= current} //enumeration?
 ;
 
 Variable:
@@ -23,30 +23,24 @@ Variable:
 ;
 
 Field:
-	  (modifiers+=FeatureModifier)* (type=[Type] | simpleType=(Primitive)) name=ID ('=' value=ID)? ';'
+	  (modifiers+=FeatureModifier)* (type=[Type] | simpleType=(PrimitiveTag)) name=ID ('=' value=ID)? ';'
 ;
 
-Method:
-	Function
+BehavioralFeature:
+	Method
   | Constructor
 ;
 
-Function:
-	(modifiers+=FeatureModifier)* (returnType=[Type] | simpleType=(Primitive)) name=ID '(' (params+=Parameter (',' params+=Parameter)*)? ')' block=Block {Block.owner = current}
+Method:
+	(modifiers+=FeatureModifier)* (returnType=[Type] | simpleType=(PrimitiveTag)) name=ID '(' (params+=Parameter (',' params+=Parameter)*)? ')' '{' (assignments+=Assignment {Assignment.owner = current})* '}'
 ;
 
 Constructor:
-	(modifiers+=FeatureModifier)* (classConstructor=[Class]) '(' (params+=Parameter (',' params+=Parameter)*)? ')' block=Block {Block.owner = current}
+	(modifiers+=FeatureModifier)* (classConstructor=[Class]) '(' (params+=Parameter (',' params+=Parameter)*)? ')' '{' (assignments+=Assignment {Assignment.owner = current})* '}'
 ;
 
 Parameter:
-	(isFinal?='final')? (type=[Type] | simpleType=(Primitive)) name=ID
-;
-
-Block:
-	{Block} '{'
-		(statements+=Assignment {Assignment.owner = current})*
-	'}'
+	(isFinal?='final')? (type=[Type] | simpleType=(PrimitiveTag)) name=ID
 ;
 
 //may add more later on (for loops, while, try etc...)
@@ -61,11 +55,11 @@ Type:
 	;
 
 ArrayType:
-	(type=[Type] | simpleType=(Primitive)) '[]'
+	(type=[Type] | simpleType=(PrimitiveTag)) '[]'
 ;
 		
 /* Predefined primitive types in Java */
-Primitive:
+PrimitiveTag:
 	'boolean' | 'byte' | 'short' | 'int' | 'long' | 'float' | 'double' | 'char' | 'void'; //should remove void....
 
 /* Class modifiers */
