@@ -1,0 +1,201 @@
+module Fminor2MyDsl;
+create OUT : MyDsl from IN : Fminor;
+
+helper def : id : Integer = 1;
+helper def : id2 : Integer = 1;
+helper def: superType : Fminor!UserType =  Fminor!UserType.allInstances();
+
+rule Model2Model {
+	from
+		f: Fminor!Model
+	to 
+		j: MyDsl!Model (
+			classes <- f.expressions
+		)
+}
+
+rule Expression2Class {
+	from
+		f: Fminor!Expression (f.oclIsTypeOf(Fminor!UserType))
+	to 
+		j: MyDsl!Class (
+			name <- f.name,
+			modifiers <- 'public',
+			features <- f.subtypes
+		)
+}
+
+rule SubType2SubClass {
+	from
+		s: Fminor!SubType (s.simpleType.oclIsUndefined()  and s.parameter.oclIsUndefined())
+	to
+		c: MyDsl!Class (
+			name <- s.name,
+			modifiers <- 'public',
+			superType <- thisModule.superType,
+			features <- thisModule.NewTypeConstructor(s)
+		)
+}	
+
+lazy rule NewTypeConstructor {
+	from 
+		t: Fminor!SubType
+	to
+		m: MyDsl!Constructor (
+			modifiers <- 'public',
+			classConstructor <- t
+		)
+}
+
+rule SubVar2SubClass {
+	from
+		s: Fminor!SubType (s.simpleType = 'char' or s.simpleType = 'int' or s.simpleType = 'boolean')
+	to
+		c: MyDsl!Class (
+			name <- s.name,
+			modifiers <- 'public final static',
+			superType <- thisModule.superType,
+			features <- thisModule.NewVarConstructor(s),
+			features <- thisModule.NewVarField(s)
+		)
+}
+
+unique lazy rule NewVarField {
+	from 
+		t: Fminor!SubType
+	to
+		c: MyDsl!Field (
+			name <- 'value',
+			modifiers <- 'private final',
+			simpleType <- t.simpleType
+		) 
+}
+
+
+lazy rule NewVarConstructor {
+	from 
+		t: Fminor!SubType
+	to
+		m: MyDsl!Constructor (
+			modifiers <- 'public',
+			classConstructor <- t,
+			params <- thisModule.NewVarParameter(t)
+		)
+}
+
+unique lazy rule NewVarParameter {
+	from
+		t: Fminor!SubType
+	to
+		p: MyDsl!Parameter (
+			isFinal <- true,
+			simpleType <- t.simpleType,
+			name <- 'aValue'
+		)
+}
+
+rule SubTup2SubClass {
+	from
+		s: Fminor!SubType (not s.parameter2.oclIsUndefined())
+	to
+		c: MyDsl!Class (
+			name <- s.name,
+			modifiers <- 'public final static',
+			superType <- thisModule.superType,
+			features <- thisModule.NewTupField(s),
+			features <- thisModule.NewTupField(s),
+			features <- thisModule.NewTupConstructor(s)
+		)
+}
+
+lazy rule NewTupField {
+	from 
+		t: Fminor!Type
+	to
+		c: MyDsl!Field (
+			name <- 'typExp' + thisModule.id,
+			modifiers <- 'private final',
+			type <- thisModule.superType,
+			simpleType <- t.simpleType
+		)
+		do {
+			thisModule.id <- thisModule.id + 1;
+		}
+}
+
+lazy rule NewTupConstructor {
+	from 
+		t: Fminor!Type
+	to
+		m: MyDsl!Constructor (
+			modifiers <- 'public',
+			classConstructor <- t,
+			params <- thisModule.NewTupParameter(t),
+			params <- thisModule.NewTupParameter(t)
+		)
+}
+
+lazy rule NewTupParameter {
+	from
+		t: Fminor!Type
+	to
+		p: MyDsl!Parameter (
+			isFinal <- false,
+			type <- thisModule.superType,
+			name <- 'aValue' + thisModule.id2
+		)
+		do {
+			thisModule.id2 <- thisModule.id2 + 1;
+		}
+}
+
+rule SubLst2SubClass {
+	from
+		s: Fminor!SubType (s.parameter.oclIsTypeOf(Fminor!UserType))
+	to
+		c: MyDsl!Class (
+			name <- s.name,
+			modifiers <- 'public final static',
+			superType <- thisModule.superType,
+			features <- thisModule.NewLstConstructor(s),
+			features <- thisModule.NewLstField(s)
+		)
+}
+
+unique lazy rule NewLstField {
+	from 
+		t: Fminor!SubType
+	to
+		c: MyDsl!Field (
+			name <- 'value',
+			type <- thisModule.superType,
+			modifiers <- 'private final'
+		) 
+}
+
+lazy rule NewLstConstructor {
+	from 
+		t: Fminor!SubType
+	to
+		m: MyDsl!Constructor (
+			modifiers <- 'public',
+			classConstructor <- t,
+			params <- thisModule.NewLstParameter(t)
+			)
+}
+
+unique lazy rule NewLstParameter {
+	from
+		t: Fminor!SubType
+	to
+		p: MyDsl!Parameter (
+			isFinal <- true,
+			type <- thisModule.superType,
+			name <- 'aValue'
+		)
+}
+
+
+
+
+

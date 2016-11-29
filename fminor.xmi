@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ASCII"?>
+<fminor:Model xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:fminor="http://www.xtext.org/example/mydsl/Fminor">
+  <expressions xsi:type="fminor:UserType" name="typExp">
+    <subtypes name="TypInt"/>
+    <subtypes name="TypeVar" simpleType="char"/>
+    <subtypes name="Arrow">
+      <parameter2 types="//@expressions.0 //@expressions.0"/>
+    </subtypes>
+    <subtypes name="Lst" parameter="//@expressions.0"/>
+  </expressions>
+</fminor:Model>
