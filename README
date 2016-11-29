@@ -1,0 +1,35 @@
+
+
+this is an interesting project. go for it!
+
+however, i would like to know a bit more about the scope of the project
+and which modeling/programming tools you are going to to be using.
+
+since you are going to model textual programming languages, you may want
+to consider using xtext (https://eclipse.org/Xtext/index.html) to specify
+both the source and target language. we will be going over xtext in the
+course in the tutorial on nov09. the xtext website has excellent tutorials
+for you to look at before then and get started earlier.
+
+xtext operates on top of the EMF framework, which we will be discussing
+over the next two weeks in the course. to learn more about this
+integration, see
+https://eclipse.org/Xtext/documentation/308_emf_integration.html#model-metamodel.
+in a nutshell, xtext uses EMF's ecore to define the metamodel of your
+language. you may then use a transformation engine (e.g., ATL) that works
+on ecore models to transform your source to your target model.
+
+in essence, you will use xtext to create a program in your source language
+and you can then save it in txt form (to be viewed by the user) and as an
+ecore XML file. you then define transformations (e.g., with ATL) based on
+the ecore representation of the source language to the ecore
+representation of the target language. the ecore XML file of the target
+language is then loaded with xtext (because it understands the ecore
+specification) and visualized as text.
+
+this way the project will allow you to get to know better key technologies
+in the software language engineering domain. let me know what you think.
+
+in any case, the next step is to define the metamodel for your source and
+target languages. try to do this sooner than later and then meet with me
+or email me to discuss your metamodels.
